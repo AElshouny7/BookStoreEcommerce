@@ -2,4 +2,7 @@ using Models;
 
 namespace Services;
 
-public static class 
+public static class ProductService
+{
+
+}
