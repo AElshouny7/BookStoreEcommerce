@@ -32,4 +32,4 @@ E:\User\Documents\My Lab\Gameball\Phase 1\Workspace\BookStoreEcommerce\obj\Debug
 E:\User\Documents\My Lab\Gameball\Phase 1\Workspace\BookStoreEcommerce\obj\Debug\net8.0\BookStoreEcommerce.pdb
 E:\User\Documents\My Lab\Gameball\Phase 1\Workspace\BookStoreEcommerce\obj\Debug\net8.0\BookStoreEcommerce.genruntimeconfig.cache
 E:\User\Documents\My Lab\Gameball\Phase 1\Workspace\BookStoreEcommerce\obj\Debug\net8.0\ref\BookStoreEcommerce.dll
-E:\User\Documents\My Lab\Gameball\Phase 1\Workspace\BookStoreEcommerce\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+E:\User\Documents\My Lab\Gameball\Phase 1\Workspace\BookStoreEcommerce\obj\Debug\net8.0\BookStoreEcommerce.sourcelink.json
