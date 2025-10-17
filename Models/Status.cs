@@ -1,4 +1,4 @@
-namespace Models;
+namespace BookStoreEcommerce.Models;
 
 public enum Status
 {

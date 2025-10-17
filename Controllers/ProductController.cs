@@ -1,8 +1,8 @@
-using Models;
-using Services;
+using BookStoreEcommerce.Models;
+using BookStoreEcommerce.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Controllers;
+namespace BookStoreEcommerce.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

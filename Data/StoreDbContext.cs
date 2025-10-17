@@ -1,12 +1,18 @@
 using Microsoft.EntityFrameworkCore;
-using Models;
+using BookStoreEcommerce.Models;
 
-namespace Data;
+namespace BookStoreEcommerce.Data;
 
 public class StoreDbContext(DbContextOptions<StoreDbContext> options) : DbContext(options)
 {
+
+
+
     public DbSet<Product> Products => Set<Product>();
-    // public DbSet<Category> Categories => Set<Category>();
+    public DbSet<Category> Categories => Set<Category>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderItems> OrderItems => Set<OrderItems>();
 
     // protected override void OnModelCreating(ModelBuilder modelBuilder)
     // {
