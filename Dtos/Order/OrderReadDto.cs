@@ -1,4 +1,4 @@
-namespace BookStoreEcommerce.Dtos
+namespace BookStoreEcommerce.Dtos.Order
 {
     public class OrderReadDto
     {
@@ -8,6 +8,8 @@ namespace BookStoreEcommerce.Dtos
         public decimal TotalAmount { get; set; }
 
         public string? Status { get; set; }
+
+        public List<OrderItemsReadDto>? OrderItems { get; set; }
     }
 
 }

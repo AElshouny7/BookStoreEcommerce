@@ -1,4 +1,5 @@
 using BookStoreEcommerce.Data;
+using BookStoreEcommerce.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +12,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IProductRepo, ProductRepo>();
 
 builder.Services.AddControllers();
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddAutoMapper(
+    typeof(Program),              // web project
+    typeof(CategoriesProfile),
+    // typeof(CommonsProfile),
+    typeof(OrdersProfile),
+    typeof(OrderItemsProfile),
+    typeof(ProductsProfile),      // domain library markers if any
+    typeof(UsersProfile)
+);// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

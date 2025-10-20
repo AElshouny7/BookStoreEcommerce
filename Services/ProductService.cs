@@ -8,5 +8,5 @@ using Npgsql;
 
 public static class ProductService
 {
-    // Test comment
+
 }
