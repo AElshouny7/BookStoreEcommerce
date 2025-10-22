@@ -34,9 +34,15 @@ namespace BookStoreEcommerce.Data
             return context.Products.FirstOrDefault(p => p.Id == id);
         }
 
+        public bool SaveChanges()
+        {
+            return (context.SaveChanges() >= 0);
+
+        }
+
         public void UpdateProduct(Product product)
         {
-            throw new NotImplementedException();
+            // No implementation needed for EF Core as it tracks changes automatically
         }
     }
 }

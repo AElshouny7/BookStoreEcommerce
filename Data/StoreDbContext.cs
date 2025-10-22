@@ -24,6 +24,7 @@ public class StoreDbContext(DbContextOptions<StoreDbContext> options) : DbContex
             // Properties
             e.Property(x => x.Name).IsRequired().HasMaxLength(120);
             e.Property(x => x.Description).HasColumnType("text");
+
         });
 
         // Product (FK --> Category)
@@ -31,14 +32,16 @@ public class StoreDbContext(DbContextOptions<StoreDbContext> options) : DbContex
         {
             // Properties
             e.Property(x => x.Title).IsRequired().HasMaxLength(120);
-            e.Property(x => x.ImageURL).IsRequired().HasMaxLength(1024);
+            e.Property(x => x.ImageURL).HasMaxLength(1024);
             e.Property(x => x.Price).IsRequired().HasColumnType("decimal(18,2)");
             e.Property(x => x.Description).HasColumnType("text");
 
             // Relations
             e.HasOne<Category>()
                 .WithMany()
-                .HasForeignKey(x => x.CategoryId);
+                .HasForeignKey(x => x.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
             e.HasIndex(x => x.CategoryId);
         });

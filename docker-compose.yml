@@ -12,6 +12,19 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+  bookstore_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bookstore_api
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__StoreDbContext=Host=postgres;Database=bookstore;Username=shouny;Password=ecommercepass
+    ports:
+      - "5000:80"
+    depends_on:
+      - postgres
 
 volumes:
   pgdata:

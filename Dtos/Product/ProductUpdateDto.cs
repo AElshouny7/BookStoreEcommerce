@@ -8,7 +8,7 @@ namespace BookStoreEcommerce.Dtos.Product
         public string? Title { get; set; }
 
         [Url]
-        public string? ImageUrl { get; set; }
+        public string? ImageURL { get; set; }
 
         [Range(typeof(decimal), "0", "999999999.99")]
         public decimal? Price { get; set; }
