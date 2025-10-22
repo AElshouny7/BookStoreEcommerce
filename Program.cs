@@ -1,15 +1,18 @@
 using BookStoreEcommerce.Data;
 using BookStoreEcommerce.Profiles;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-// builder.Services.AddDbContext<BookStoreEcommerce.Data.StoreDbContext>(options =>
-//     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-// );
+var cs = builder.Configuration.GetConnectionString("Default");
+builder.Services.AddDbContext<StoreDbContext>(opt =>
+    opt.UseNpgsql(cs));
 
 builder.Services.AddScoped<IProductRepo, ProductRepo>();
+// Add Others Repos Here
+
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(

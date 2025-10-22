@@ -1,4 +1,5 @@
 using BookStoreEcommerce.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreEcommerce.Data
 {
@@ -7,7 +8,9 @@ namespace BookStoreEcommerce.Data
         public static void PrepPopulation(IApplicationBuilder app)
         {
             using var serviceScope = app.ApplicationServices.CreateScope();
-            SeedData(serviceScope.ServiceProvider.GetService<StoreDbContext>());
+            var ctx = serviceScope.ServiceProvider.GetRequiredService<StoreDbContext>();
+            ctx.Database.Migrate();
+            SeedData(ctx);
         }
 
         private static void SeedData(StoreDbContext context)
