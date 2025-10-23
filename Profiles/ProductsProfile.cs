@@ -1,3 +1,4 @@
+using System.Collections;
 using BookStoreEcommerce.Dtos.Category;
 using BookStoreEcommerce.Dtos.Product;
 using BookStoreEcommerce.Models;
@@ -8,13 +9,18 @@ namespace BookStoreEcommerce.Profiles
     {
         public ProductsProfile()
         {
-            // Source -> Target
+            // Source -> TargetP
             CreateMap<ProductCreateDto, Product>();
             CreateMap<ProductUpdateDto, Product>()
-                .ForAllMembers(opt => opt.Condition((src, _, val) => val != null));
+                .ForMember(d => d.Price, o => o.PreCondition(src => src.Price.HasValue))
+                .ForMember(d => d.StockQuantity, o => o.PreCondition(src => src.StockQuantity.HasValue))
+                .ForMember(d => d.CategoryId, o => o.PreCondition(src => src.CategoryId.HasValue))
+                .ForAllMembers(o => o.Condition((src, _, v) => v != null));
+
             CreateMap<Product, ProductReadDto>();
             CreateMap<Product, ProductListItemDto>();
-            CreateMap<Category, CategoryMiniDto>();
+            // CreateMap<Category, CategoryMiniDto>();
         }
     }
+
 }
