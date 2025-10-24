@@ -10,9 +10,10 @@ namespace BookStoreEcommerce.Profiles
         {
             CreateMap<UserRegisterDto, User>()
                 .ForMember(d => d.Id, o => o.Ignore())
-                .ForMember(d => d.PasswordHash, o => o.Ignore())   // set in service
-                .ForMember(d => d.CreatedAt, o => o.Ignore())   // set in service
-                .ForMember(d => d.Email, o => o.MapFrom(s => s.Email.Trim().ToLower()));
+                .ForMember(d => d.PasswordHash, o => o.Ignore())
+                .ForMember(d => d.CreatedAt, o => o.Ignore())
+                .ForMember(d => d.Email, o => o.MapFrom(s => s.Email!.Trim().ToLower()))
+                .ForMember(d => d.FullName, o => o.MapFrom(s => s.FullName!.Trim()));
 
             CreateMap<User, UserReadDto>();
 
@@ -20,9 +21,19 @@ namespace BookStoreEcommerce.Profiles
                 .ForMember(d => d.Id, o => o.Ignore())
                 .ForMember(d => d.PasswordHash, o => o.Ignore())
                 .ForMember(d => d.CreatedAt, o => o.Ignore())
-                .ForMember(d => d.Email, o => o.MapFrom((s, d) =>
-                    s.Email is null ? d.Email : s.Email.Trim().ToLower()))
-                .ForAllMembers(o => o.Condition((src, dest, val) => val != null));
+                // Only map Email if provided AND not whitespace, and normalize it
+                .ForMember(d => d.Email, o =>
+                    {
+                        o.PreCondition(s => !string.IsNullOrWhiteSpace(s.Email));
+                        o.MapFrom(s => s.Email!.Trim().ToLower());
+                    })
+                // Only map FullName if provided AND not whitespace
+                .ForMember(d => d.FullName, o =>
+                    {
+                        o.PreCondition(s => !string.IsNullOrWhiteSpace(s.FullName));
+                        o.MapFrom(s => s.FullName!.Trim());
+                    });
+
 
             // No map for LoginDto -> User; login is a verification flow, not a create/update
         }

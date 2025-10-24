@@ -2,14 +2,9 @@ using BookStoreEcommerce.Models;
 
 namespace BookStoreEcommerce.DBContext
 {
-    public class UserRepo : IUserRepo
+    public class UserRepo(StoreDbContext context) : IUserRepo
     {
-        private readonly StoreDbContext _context;
-
-        public UserRepo(StoreDbContext context)
-        {
-            _context = context;
-        }
+        private readonly StoreDbContext _context = context;
 
         public IEnumerable<User> GetAllUsers()
         {
@@ -21,23 +16,27 @@ namespace BookStoreEcommerce.DBContext
             return _context.Users.FirstOrDefault(u => u.Id == id);
         }
 
-        public void AddUser(User user)
+        public User AddUser(User user)
         {
             _context.Users.Add(user);
+            return user;
         }
 
-        public void UpdateUser(User user)
+        public User? UpdateUser(User user)
         {
             _context.Users.Update(user);
+            return user;
         }
 
-        public void DeleteUser(int id)
+        public User? DeleteUser(int id)
         {
             var user = GetUserById(id);
             if (user != null)
             {
                 _context.Users.Remove(user);
+                return user;
             }
+            return null;
         }
 
         public bool SaveChanges()

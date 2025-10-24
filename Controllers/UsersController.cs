@@ -1,5 +1,6 @@
 using BookStoreEcommerce.Dtos.User;
 using BookStoreEcommerce.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStoreEcommerce.Controllers;
@@ -7,7 +8,8 @@ namespace BookStoreEcommerce.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserController(IUserService userService) : ControllerBase
+[Authorize]
+public class UsersController(IUserService userService) : ControllerBase
 {
     private readonly IUserService _userService = userService;
 
@@ -30,22 +32,6 @@ public class UserController(IUserService userService) : ControllerBase
         }
         return Ok(user);
     }
-
-    // // POST create new user
-    // [HttpPost]
-    // public ActionResult<UserReadDto> AddUser(UserCreateDto userCreateDto)
-    // {
-    //     try
-    //     {
-    //         var createdUser = _userService.AddUser(userCreateDto);
-
-    //         return CreatedAtRoute(nameof(GetUserById), new { Id = createdUser.Id }, createdUser);
-    //     }
-    //     catch (ArgumentException ex)
-    //     {
-    //         return BadRequest(new { message = ex.Message });
-    //     }
-    // }
 
     // PUT update user
     [HttpPut("{id}")]

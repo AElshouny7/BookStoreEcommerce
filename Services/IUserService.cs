@@ -8,7 +8,8 @@ public interface IUserService
     UserReadDto? GetUserById(int id);
     UserReadDto? UpdateUser(int id, UserUpdateDto userDto);
     UserReadDto? DeleteUser(int id);
-    // UserReadDto? AuthenticateUser(UserLoginDto userLoginDto);
     UserReadDto RegisterUser(UserRegisterDto userRegisterDto);
+
+    AuthResponseDto AuthenticateUser(UserLoginDto userLoginDto);
 
 }

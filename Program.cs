@@ -1,8 +1,13 @@
+using System.Text;
 using BookStoreEcommerce.DBContext;
-using BookStoreEcommerce.DBContext;
+using BookStoreEcommerce.Models;
 using BookStoreEcommerce.Profiles;
 using BookStoreEcommerce.Services;
+using BookStoreEcommerce.Services.Auth;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,12 +17,38 @@ var cs = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<StoreDbContext>(opt =>
     opt.UseNpgsql(cs));
 
+var jwt = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwt["Key"]);
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwt["Issuer"],
+            ValidAudience = jwt["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+
 builder.Services.AddScoped<IProductRepo, ProductRepo>();
 builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
+builder.Services.AddScoped<IUserRepo, UserRepo>();
 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
+
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(
@@ -26,7 +57,7 @@ builder.Services.AddAutoMapper(
     // typeof(CommonsProfile),
     typeof(OrdersProfile),
     typeof(OrderItemsProfile),
-    typeof(ProductsProfile),      // domain library markers if any
+    typeof(ProductsProfile),      
     typeof(UsersProfile)
 );// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -45,6 +76,7 @@ PrepDb.PrepPopulation(app);
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
