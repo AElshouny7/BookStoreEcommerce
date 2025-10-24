@@ -1,19 +1,21 @@
 using BookStoreEcommerce.Models;
 
-namespace BookStoreEcommerce.Data
+namespace BookStoreEcommerce.DBContext
 {
     public class ProductRepo(StoreDbContext context) : IProductRepo
     {
-        public void AddProduct(Product product)
+        public Product AddProduct(Product product)
         {
             ArgumentNullException.ThrowIfNull(product);
 
             context.Products.Add(product);
-            context.SaveChanges();
-
+            return product;
         }
 
-        public void DeleteProduct(int id)
+
+
+
+        public Product? DeleteProduct(int id)
         {
             if (id <= 0)
             {
@@ -21,7 +23,8 @@ namespace BookStoreEcommerce.Data
             }
             var product = context.Products.FirstOrDefault(p => p.Id == id) ?? throw new InvalidOperationException("Product not found");
             context.Products.Remove(product);
-            context.SaveChanges();
+            return product;
+
         }
 
         public IEnumerable<Product> GetAllProducts()
@@ -36,13 +39,14 @@ namespace BookStoreEcommerce.Data
 
         public bool SaveChanges()
         {
-            return (context.SaveChanges() >= 0);
+            return context.SaveChanges() >= 0;
 
         }
 
-        public void UpdateProduct(Product product)
+        public Product? UpdateProduct(Product product)
         {
             // No implementation needed for EF Core as it tracks changes automatically
+            return product;
         }
     }
 }

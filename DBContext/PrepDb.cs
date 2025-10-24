@@ -1,7 +1,7 @@
 using BookStoreEcommerce.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BookStoreEcommerce.Data
+namespace BookStoreEcommerce.DBContext
 {
     public static class PrepDb
     {

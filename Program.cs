@@ -1,5 +1,7 @@
-using BookStoreEcommerce.Data;
+using BookStoreEcommerce.DBContext;
+using BookStoreEcommerce.DBContext;
 using BookStoreEcommerce.Profiles;
+using BookStoreEcommerce.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,7 +13,10 @@ builder.Services.AddDbContext<StoreDbContext>(opt =>
     opt.UseNpgsql(cs));
 
 builder.Services.AddScoped<IProductRepo, ProductRepo>();
-// Add Others Repos Here
+builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
+
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 
 builder.Services.AddControllers();

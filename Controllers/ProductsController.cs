@@ -1,8 +1,5 @@
-using System.Threading.Tasks;
-using AutoMapper;
-using BookStoreEcommerce.Data;
+
 using BookStoreEcommerce.Dtos.Product;
-using BookStoreEcommerce.Models;
 using BookStoreEcommerce.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,78 +7,79 @@ namespace BookStoreEcommerce.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController(IProductRepo repository, IMapper mapper) : ControllerBase
+public class ProductsController(IProductService productService) : ControllerBase
 {
-    private readonly IProductRepo _repository = repository;
-    private readonly IMapper _mapper = mapper;
+    private readonly IProductService _productService = productService;
 
 
     // GET all products
     [HttpGet]
     public ActionResult<IEnumerable<ProductReadDto>> GetAllProducts()
     {
-        var products = _repository.GetAllProducts();
-
-
-        return Ok(_mapper.Map<IEnumerable<ProductReadDto>>(products));
+        var products = _productService.GetAllProducts();
+        return Ok(products);
     }
 
     // GET product by id
-    [HttpGet("{id}", Name = "GetProductById")]
+    [HttpGet("{id:int}", Name = "GetProductById")]
     public ActionResult<ProductReadDto> GetProductById(int id)
     {
-        var product = _repository.GetProductById(id);
+        var product = _productService.GetProductById(id);
         if (product == null)
         {
             return NotFound();
         }
-        return Ok(_mapper.Map<ProductReadDto>(product));
+        return Ok(product);
     }
 
     // POST create new product
     [HttpPost]
     public ActionResult<ProductReadDto> AddProduct(ProductCreateDto productCreateDto)
     {
-        var productModel = _mapper.Map<Product>(productCreateDto);
-        _repository.AddProduct(productModel);
-        _repository.SaveChanges();
+        try
+        {
+            var createdProduct = _productService.AddProduct(productCreateDto);
 
-        var productReadDto = _mapper.Map<ProductReadDto>(productModel);
+            return CreatedAtRoute(nameof(GetProductById), new { Id = createdProduct.Id }, createdProduct);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
 
-        return CreatedAtRoute(nameof(GetProductById), new { Id = productReadDto.Id }, productReadDto);
     }
 
 
     // PUT update product
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     public async Task<ActionResult<ProductReadDto>> UpdateProduct(int id, ProductUpdateDto productUpdateDto)
     {
-        var productModelFromRepo = _repository.GetProductById(id);
-        if (productModelFromRepo == null)
-            return NotFound();
-
-        _mapper.Map(productUpdateDto, productModelFromRepo);
-        _repository.UpdateProduct(productModelFromRepo);
-        _repository.SaveChanges();
-
-        return Ok(_mapper.Map<ProductReadDto>(productModelFromRepo));
+        try
+        {
+            var updatedProduct = _productService.UpdateProduct(id, productUpdateDto);
+            if (updatedProduct == null)
+            {
+                return NotFound();
+            }
+            return Ok(updatedProduct);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
 
     // DELETE delete product
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     public ActionResult<ProductReadDto> DeleteProduct(int id)
     {
-        var productModelFromRepo = _repository.GetProductById(id);
-        if (productModelFromRepo == null)
+        var deletedProduct = _productService.DeleteProduct(id);
+        if (deletedProduct == null)
         {
             return NotFound();
         }
-
-        _repository.DeleteProduct(id);
-        _repository.SaveChanges();
-
-        return Ok(_mapper.Map<ProductReadDto>(productModelFromRepo));
+        return Ok(deletedProduct);
     }
 }
 

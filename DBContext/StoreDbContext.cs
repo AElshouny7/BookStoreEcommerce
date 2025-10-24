@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using BookStoreEcommerce.Models;
 
-namespace BookStoreEcommerce.Data;
+namespace BookStoreEcommerce.DBContext;
 
 public class StoreDbContext(DbContextOptions<StoreDbContext> options) : DbContext(options)
 {
