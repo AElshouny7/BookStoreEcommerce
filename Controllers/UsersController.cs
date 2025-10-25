@@ -14,6 +14,7 @@ public class UsersController(IUserService userService) : ControllerBase
     private readonly IUserService _userService = userService;
 
     // GET all users
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public ActionResult<IEnumerable<UserReadDto>> GetAllUsers()
     {

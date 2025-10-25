@@ -13,14 +13,26 @@ public class TokenService(IConfiguration config) : ITokenService
         var jwtSettings = config.GetSection("Jwt");
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
 
+        var adminEmails = config.GetSection("Auth:AdminEmails").Get<List<string>>() ?? [];
+        var isAdmin = adminEmails.Any(email => email.Equals(user.Email, StringComparison.OrdinalIgnoreCase));
+
+
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.FullName ?? string.Empty),
-            new Claim(ClaimTypes.Email,  user.Email)
+            new Claim(ClaimTypes.Email,  user.Email!)
+
         };
+
+        if (isAdmin)
+        {
+            var claimsList = claims.ToList();
+            claimsList.Add(new Claim(ClaimTypes.Role, "Admin"));
+            claims = claimsList.ToArray();
+        }
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var expires = DateTime.UtcNow.AddMinutes(

@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using System.Text;
+using BookStoreEcommerce.Auth;
 using BookStoreEcommerce.DBContext;
 using BookStoreEcommerce.Models;
 using BookStoreEcommerce.Profiles;
@@ -31,11 +33,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = jwt["Issuer"],
             ValidAudience = jwt["Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(key),
+            RoleClaimType = ClaimTypes.Role,
             ClockSkew = TimeSpan.Zero
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAppAuthorization();
 
 
 builder.Services.AddScoped<IProductRepo, ProductRepo>();
@@ -57,7 +60,7 @@ builder.Services.AddAutoMapper(
     // typeof(CommonsProfile),
     typeof(OrdersProfile),
     typeof(OrderItemsProfile),
-    typeof(ProductsProfile),      
+    typeof(ProductsProfile),
     typeof(UsersProfile)
 );// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
