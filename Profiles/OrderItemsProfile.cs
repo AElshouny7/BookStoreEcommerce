@@ -8,11 +8,12 @@ namespace BookStoreEcommerce.Profiles
     {
         public OrderItemsProfile()
         {
-            // // Client -> Domain (create item)
-            // CreateMap<OrderItemCreateDto, OrderItems>();
-
-            // // Domain -> Read DTO
-            // CreateMap<OrderItems, OrderItemsReadDto>();
+            // Client -> Domain
+            CreateMap<OrderItemsReadDto, OrderItemsReadDto>()
+                .ForMember(dest => dest.TotalPrice,
+                    opt => opt.MapFrom(src => src.Quantity * src.UnitPrice))
+                .ForMember(dest => dest.ProductTitle,
+                    opt => opt.Ignore()); // needs a product-title dictionary (DB)
         }
     }
 }

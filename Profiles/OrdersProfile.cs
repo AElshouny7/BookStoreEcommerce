@@ -9,20 +9,11 @@ namespace BookStoreEcommerce.Profiles
     {
         public OrdersProfile()
         {
-            // // Create: map ONLY order-level fields. Items are handled in the service
-            // CreateMap<OrderCreateDto, Order>()
-            //     .ForMember(d => d.Id, o => o.Ignore())
-            //     .ForMember(d => d.UserId, o => o.Ignore())     // set from auth
-            //     .ForMember(d => d.OrderDate, o => o.Ignore())     // set in service
-            //     .ForMember(d => d.TotalAmount, o => o.Ignore())     // compute in service
-            //     .ForMember(d => d.Status, o => o.Ignore());    // set default in service
-
-            // // Read: enum -> string for Status; Items list is filled in service
-            // CreateMap<Order, OrderReadDto>()
-            //     .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()))
-            //     .ForMember(d => d.OrderItems, o => o.Ignore());
-
-
+            CreateMap<Order, OrderReadDto>()
+                .ForMember(dest => dest.Status,
+                     opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.OrderItems,
+                     opt => opt.Ignore()); // Handled separately depends on a separate query (no nav props)
         }
     }
 }

@@ -12,19 +12,63 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-  bookstore_api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: bookstore_api
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: bookstore_redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"] # basic persistence
+    ports:
+      - "6379:6379" # expose only if you need to inspect from host
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: bookstore_rabbitmq
     restart: unless-stopped
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__StoreDbContext=Host=postgres;Database=bookstore;Username=shouny;Password=ecommercepass
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
     ports:
-      - "5000:80"
-    depends_on:
-      - postgres
+      - "5672:5672" # AMQP
+      - "15672:15672" # management UI (http://localhost:15672)
+    volumes:
+      - rabbitmqdata:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # bookstore_api:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: bookstore_api
+  #   restart: unless-stopped
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ConnectionStrings__StoreDbContext=Host=postgres;Database=bookstore;Username=shouny;Password=ecommercepass
+  #     - Redis__Configuration=redis:6379
+  #   ports:
+  #     - "5000:80"
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #     - rabbitmq
 
 volumes:
   pgdata:
+  redisdata:
+  rabbitmqdata:

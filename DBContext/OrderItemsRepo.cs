@@ -13,18 +13,6 @@ namespace BookStoreEcommerce.DBContext
             return orderItems;
         }
 
-        public OrderItems? DeleteOrderItemsByOrderAndProductId(int orderId, int productId)
-        {
-            var existingOrderItem = _context.OrderItems
-                .FirstOrDefault(oi => oi.OrderId == orderId && oi.ProductId == productId);
-            if (existingOrderItem != null)
-            {
-                _context.OrderItems.Remove(existingOrderItem);
-                return existingOrderItem;
-            }
-            return null;
-        }
-
         public IEnumerable<OrderItems> GetAllOrderItems()
         {
             return _context.OrderItems.ToList();
@@ -44,14 +32,40 @@ namespace BookStoreEcommerce.DBContext
                 .ToList();
         }
 
+        public OrderItems? GetOrderItemById(int id)
+        {
+            return _context.OrderItems.Find(id);
+        }
+        public OrderItems? UpdateOrderItems(OrderItems orderItems)
+        {
+            return orderItems;
+        }
+
+        public OrderItems? DeleteOrderItemsByOrderAndProductId(int orderId, int productId)
+        {
+            var existingOrderItem = _context.OrderItems
+                .FirstOrDefault(oi => oi.OrderId == orderId && oi.ProductId == productId);
+            if (existingOrderItem != null)
+            {
+                _context.OrderItems.Remove(existingOrderItem);
+                return existingOrderItem;
+            }
+            return null;
+        }
+
+        public OrderItems? DeleteOrderItemsById(int id)
+        {
+            var item = _context.OrderItems.FirstOrDefault(x => x.Id == id)
+               ?? throw new InvalidOperationException("Order item not found.");
+
+            _context.OrderItems.Remove(item);
+            return item;
+        }
+
         public bool SaveChanges()
         {
             return _context.SaveChanges() >= 0;
         }
 
-        public OrderItems? UpdateOrderItems(OrderItems orderItems)
-        {
-            return orderItems;
-        }
     }
 }
