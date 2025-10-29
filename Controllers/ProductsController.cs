@@ -12,7 +12,8 @@ public class ProductsController(IProductService productService) : ControllerBase
     private readonly IProductService _productService = productService;
 
 
-    // GET all products
+    // GET all products 
+    // TODO: add categories to filter
     [HttpGet]
     public ActionResult<IEnumerable<ProductReadDto>> GetAllProducts()
     {

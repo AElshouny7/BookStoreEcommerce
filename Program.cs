@@ -15,6 +15,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>() ?? ["http://localhost:4200"];
+
 var cs = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<StoreDbContext>(opt =>
     opt.UseNpgsql(cs));
@@ -51,7 +55,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<IOrderItemsService, OrderItemsService>();
+// builder.Services.AddScoped<IOrderItemsService, OrderItemsService>();
 
 
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
@@ -66,8 +70,22 @@ builder.Services.AddAutoMapper(
     typeof(OrderItemsProfile),
     typeof(ProductsProfile),
     typeof(UsersProfile)
-);// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+);
+
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              ;
+    });
+});
+
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
@@ -82,10 +100,13 @@ if (app.Environment.IsDevelopment())
 PrepDb.PrepPopulation(app);
 
 app.UseHttpsRedirection();
+app.UseCors("AllowAngular");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+
 
 app.Run();
