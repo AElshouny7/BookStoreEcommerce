@@ -1,9 +1,8 @@
 using AutoMapper;
 using BookStoreEcommerce.DBContext;
-using BookStoreEcommerce.Dtos;
 using BookStoreEcommerce.Dtos.Order;
+using BookStoreEcommerce.Dtos.OrderItems;
 using BookStoreEcommerce.Models;
-using Microsoft.Extensions.Configuration.UserSecrets;
 
 namespace BookStoreEcommerce.Services;
 

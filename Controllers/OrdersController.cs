@@ -1,0 +1,80 @@
+using BookStoreEcommerce.Dtos.Order;
+using BookStoreEcommerce.Services;
+using Microsoft.AspNetCore.Mvc;
+
+namespace BookStoreEcommerce.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class OrdersController(IOrderService _orderService) : ControllerBase
+{
+    private readonly IOrderService _orderService = _orderService;
+
+    [HttpGet]
+    public ActionResult<IEnumerable<OrderReadDto>> GetAllOrders()
+    {
+        var orders = _orderService.GetAllOrders();
+        return Ok(orders);
+    }
+
+    [HttpGet("{id:int}")]
+    public ActionResult<OrderReadDto> GetOrderById(int id)
+    {
+        var order = _orderService.GetOrderById(id);
+        return order is null ? NotFound() : Ok(order);
+    }
+
+    [HttpGet("by-user/{userId:int}")]
+    public ActionResult<IEnumerable<OrderReadDto>> GetOrderByUser(int userId)
+    {
+        var orders = _orderService.GetOrdersByUserId(userId);
+        return Ok(orders);
+    }
+
+    [HttpPost]
+    public ActionResult<OrderReadDto> CreateOrder([FromQuery] int userId, [FromBody] OrderCreateDto dto)
+    {
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+
+        try
+        {
+            var created = _orderService.CreateOrder(userId, dto);
+            if (created is null) return BadRequest(new { error = "Failed to create order." });
+            // return 201 with location header
+            return CreatedAtAction(nameof(GetOrderById), new { id = created.Id }, created);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    [HttpPut("{id:int}/status")]
+    public ActionResult<OrderReadDto> UpdateStatus(int id, [FromBody] OrderStatusUpdateDto dto)
+    {
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        if (string.IsNullOrWhiteSpace(dto.Status)) return BadRequest(new { error = "Status is required." });
+
+        try
+        {
+            var updated = _orderService.UpdateOrderStatus(id, dto.Status);
+            return updated is null ? NotFound() : Ok(updated);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    [HttpDelete("{id:int}")]
+    public ActionResult<OrderReadDto> DeleteOrder(int id)
+    {
+        var deleted = _orderService.DeleteOrder(id);
+        return deleted is null ? NotFound() : Ok(deleted);
+    }
+
+}

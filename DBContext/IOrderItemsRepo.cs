@@ -7,7 +7,7 @@ namespace BookStoreEcommerce.DBContext
         IEnumerable<OrderItems> GetAllOrderItems();
         IEnumerable<OrderItems> GetOrderItemsByOrderId(int orderId);
         IEnumerable<OrderItems> GetOrderItemsByProductId(int productId);
-
+        OrderItems? GetOrderItemsByOrderAndProductId(int orderId, int productId);
         OrderItems? GetOrderItemById(int id);
         OrderItems AddOrderItems(OrderItems orderItems);
         OrderItems? UpdateOrderItems(OrderItems orderItems);

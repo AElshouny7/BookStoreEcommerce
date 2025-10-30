@@ -55,22 +55,15 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-// builder.Services.AddScoped<IOrderItemsService, OrderItemsService>();
+builder.Services.AddScoped<IOrderItemsService, OrderItemsService>();
 
 
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddControllers();
-builder.Services.AddAutoMapper(
-    typeof(Program),              // web project
-    typeof(CategoriesProfile),
-    // typeof(CommonsProfile),
-    typeof(OrdersProfile),
-    typeof(OrderItemsProfile),
-    typeof(ProductsProfile),
-    typeof(UsersProfile)
-);
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

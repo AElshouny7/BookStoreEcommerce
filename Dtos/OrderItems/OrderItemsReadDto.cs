@@ -1,9 +1,9 @@
-namespace BookStoreEcommerce.Dtos
+namespace BookStoreEcommerce.Dtos.OrderItems
 {
     public class OrderItemsReadDto
     {
-        // public int Id { get; set; }
-        // public int OrderId { get; set; }
+        public int Id { get; set; }
+        public int OrderId { get; set; }
         public int ProductId { get; set; }
         public string? ProductTitle { get; set; }
         public int Quantity { get; set; }

@@ -86,8 +86,8 @@ public class StoreDbContext(DbContextOptions<StoreDbContext> options) : DbContex
 
 
             // Relations
-            e.HasKey(x => new { x.OrderId, x.ProductId });
-
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => new { x.OrderId, x.ProductId }).IsUnique();
 
             // FK to Order
             e.HasOne<Order>()

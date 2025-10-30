@@ -1,3 +1,5 @@
+using BookStoreEcommerce.Dtos.OrderItems;
+
 namespace BookStoreEcommerce.Dtos.Order
 {
     public class OrderReadDto

@@ -32,9 +32,14 @@ namespace BookStoreEcommerce.DBContext
                 .ToList();
         }
 
+        public OrderItems? GetOrderItemsByOrderAndProductId(int orderId, int productId)
+        {
+            return _context.OrderItems.FirstOrDefault(oi => oi.OrderId == orderId && oi.ProductId == productId);
+        }
+
         public OrderItems? GetOrderItemById(int id)
         {
-            return _context.OrderItems.Find(id);
+            return _context.OrderItems.FirstOrDefault(x => x.Id == id);
         }
         public OrderItems? UpdateOrderItems(OrderItems orderItems)
         {
