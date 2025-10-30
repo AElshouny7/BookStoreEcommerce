@@ -22,23 +22,35 @@ public class OrderItemsService(
     private readonly IOrderService _orderService = _orderService;
     private readonly IMapper _mapper = _mapper;
 
+    public IEnumerable<OrderItemsReadDto> GetAllOrderItems()
+    {
+        var items = _orderItems.GetAllOrderItems().ToList();
+        return HydrateTitles(_mapper.Map<List<OrderItemsReadDto>>(items), items);
+    }
 
     public IEnumerable<OrderItemsReadDto> GetOrderItemsByOrderId(int orderId)
     {
         var items = _orderItems.GetOrderItemsByOrderId(orderId).ToList();
-        var dtos = _mapper.Map<List<OrderItemsReadDto>>(items);
+        return HydrateTitles(_mapper.Map<List<OrderItemsReadDto>>(items), items);
+    }
 
-        // attach product titles
-        var productIds = items.Select(i => i.ProductId).Distinct().ToList();
-        var titles = _context.Products
-            .Where(p => productIds.Contains(p.Id))
-            .Select(p => new { p.Id, p.Title })
-            .ToDictionary(p => p.Id, p => p.Title);
+    public IEnumerable<OrderItemsReadDto> GetOrderItemsByProductId(int productId)
+    {
+        var items = _orderItems.GetOrderItemsByProductId(productId).ToList();
+        return HydrateTitles(_mapper.Map<List<OrderItemsReadDto>>(items), items);
+    }
 
-        foreach (var i in dtos)
-            i.ProductTitle = titles.TryGetValue(i.ProductId, out var t) ? t : null;
+    public OrderItemsReadDto? GetOrderItemsByOrderAndProductId(int orderId, int productId)
+    {
+        var item = _orderItems.GetOrderItemsByOrderAndProductId(orderId, productId);
+        if (item is null) return null;
 
-        return dtos;
+        var dto = _mapper.Map<OrderItemsReadDto>(item);
+        dto.ProductTitle = _context.Products
+            .Where(p => p.Id == item.ProductId)
+            .Select(p => p.Title)
+            .FirstOrDefault();
+        return dto;
     }
 
     public OrderItemsReadDto? GetOrderItemsById(int id)
@@ -66,18 +78,17 @@ public class OrderItemsService(
         var unitPrice = product.Price;
 
         int deltaQty = dto.Quantity;
+
+        if (product.StockQuantity < deltaQty)
+            throw new InvalidOperationException("Insufficient stock.");
+
         if (existing is not null)
         {
-            if (product.StockQuantity < deltaQty)
-                throw new InvalidOperationException("Insufficient stock.");
-
             existing.Quantity += deltaQty;
             _orderItems.UpdateOrderItems(existing);
         }
         else
         {
-            if (product.StockQuantity < dto.Quantity)
-                throw new InvalidOperationException("Insufficient stock.");
 
             _orderItems.AddOrderItems(new OrderItems
             {
@@ -96,7 +107,7 @@ public class OrderItemsService(
         return _orderService.GetOrderById(orderId)!;
     }
 
-    public OrderReadDto UpdateQuantity(int orderItemId, OrderItemUpdateDto dto)
+    public OrderReadDto UpdateOrderItems(int orderItemId, OrderItemUpdateDto dto)
     {
         if (dto.Quantity <= 0) throw new ArgumentException("Quantity must be >= 1.");
 
@@ -128,7 +139,24 @@ public class OrderItemsService(
         return _orderService.GetOrderById(order.Id)!;
     }
 
-    public OrderReadDto RemoveOrderItemsById(int orderItemId)
+    public OrderReadDto? DeleteOrderItemsByOrderAndProductId(int orderId, int productId)
+    {
+        var item = _orderItems.GetOrderItemsByOrderAndProductId(orderId, productId);
+        if (item is null) return null;
+
+        var order = _orders.GetOrderById(orderId) ?? throw new InvalidOperationException("Order not found.");
+        var product = _products.GetProductById(productId) ?? throw new InvalidOperationException("Product not found.");
+
+        product.StockQuantity += item.Quantity;
+        order.TotalAmount -= item.UnitPrice * item.Quantity;
+
+        _orderItems.DeleteOrderItemsByOrderAndProductId(orderId, productId);
+        _context.SaveChanges();
+
+        return _orderService.GetOrderById(order.Id)!;
+    }
+
+    public OrderReadDto DeleteOrderItemsById(int orderItemId)
     {
         var item = _orderItems.GetOrderItemById(orderItemId) ?? throw new InvalidOperationException("Order item not found.");
         var order = _orders.GetOrderById(item.OrderId) ?? throw new InvalidOperationException("Order not found.");
@@ -143,4 +171,20 @@ public class OrderItemsService(
         return _orderService.GetOrderById(order.Id)!;
     }
 
+
+    private IEnumerable<OrderItemsReadDto> HydrateTitles(List<OrderItemsReadDto> dtos, List<OrderItems> items)
+    {
+        var productIds = items.Select(i => i.ProductId).Distinct().ToList();
+        if (productIds.Count == 0) return dtos;
+
+        var titles = _context.Products
+            .Where(p => productIds.Contains(p.Id))
+            .Select(p => new { p.Id, p.Title })
+            .ToDictionary(p => p.Id, p => p.Title);
+
+        foreach (var i in dtos)
+            i.ProductTitle = titles.TryGetValue(i.ProductId, out var t) ? t : null;
+
+        return dtos;
+    }
 }

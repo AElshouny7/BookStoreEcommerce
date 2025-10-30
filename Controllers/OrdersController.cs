@@ -40,7 +40,7 @@ public class OrdersController(IOrderService _orderService) : ControllerBase
         {
             var created = _orderService.CreateOrder(userId, dto);
             if (created is null) return BadRequest(new { error = "Failed to create order." });
-            // return 201 with location header
+
             return CreatedAtAction(nameof(GetOrderById), new { id = created.Id }, created);
         }
         catch (ArgumentException ex)

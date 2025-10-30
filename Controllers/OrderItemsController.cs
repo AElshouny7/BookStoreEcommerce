@@ -1,3 +1,4 @@
+using BookStoreEcommerce.Dtos.Order;
 using BookStoreEcommerce.Dtos.OrderItems;
 using BookStoreEcommerce.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +11,28 @@ public class OrderItemsController(IOrderItemsService orderItemsService) : Contro
 {
     private readonly IOrderItemsService _orderItemsService = orderItemsService;
 
+    [HttpGet("order-items")]
+    public ActionResult<IEnumerable<OrderItemsReadDto>> GetAllOrderItems()
+        => Ok(_orderItemsService.GetAllOrderItems());
+
     [HttpGet("orders/{orderId:int}/items")]
-    public ActionResult<IEnumerable<OrderItemsReadDto>> GetOrderItemsByOrderId(int orderId)
-        => Ok(_orderItemsService.GetOrderItemsByOrderId(orderId));
+    public ActionResult<IEnumerable<OrderItemsReadDto>> GetByOrder(int orderId)
+    {
+        return Ok(_orderItemsService.GetOrderItemsByOrderId(orderId));
+    }
+
+    [HttpGet("products/{productId:int}/order-items")]
+    public ActionResult<IEnumerable<OrderItemsReadDto>> GetByProduct(int productId)
+    {
+        return Ok(_orderItemsService.GetOrderItemsByProductId(productId));
+    }
+
+    [HttpGet("orders/{orderId:int}/items/{productId:int}")]
+    public ActionResult<OrderItemsReadDto> GetByOrderAndProduct(int orderId, int productId)
+    {
+        var item = _orderItemsService.GetOrderItemsByOrderAndProductId(orderId, productId);
+        return item is null ? NotFound() : Ok(item);
+    }
 
     [HttpGet("order-items/{id:int}")]
     public ActionResult<OrderItemsReadDto> GetOrderItemsById(int id)
@@ -24,6 +44,7 @@ public class OrderItemsController(IOrderItemsService orderItemsService) : Contro
     [HttpPost("orders/{orderId:int}/items")]
     public ActionResult AddOrderItems(int orderId, [FromBody] OrderItemCreateDto dto)
     {
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
         try
         {
             var updatedOrder = _orderItemsService.AddOrderItems(orderId, dto);
@@ -34,26 +55,30 @@ public class OrderItemsController(IOrderItemsService orderItemsService) : Contro
     }
 
     [HttpPut("order-items/{orderItemId:int}")]
-    public ActionResult UpdateQuantity(int orderItemId, [FromBody] OrderItemUpdateDto dto)
+    public ActionResult UpdateOrderItems(int orderItemId, [FromBody] OrderItemUpdateDto dto)
     {
         try
         {
-            var updatedOrder = _orderItemsService.UpdateQuantity(orderItemId, dto);
+            var updatedOrder = _orderItemsService.UpdateOrderItems(orderItemId, dto);
             return Ok(updatedOrder);
         }
         catch (ArgumentException ex) { return BadRequest(new { error = ex.Message }); }
         catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
     }
 
-    [HttpDelete("order-items/{orderItemId:int}")]
-    public ActionResult RemoveOrderItemsById(int orderItemId)
+    [HttpDelete("orders/{orderId:int}/items/{productId:int}")]
+    public ActionResult<OrderReadDto> DeleteOrderItemsByOrderAndProductId(int orderId, int productId)
     {
-        try
-        {
-            var updatedOrder = _orderItemsService.RemoveOrderItemsById(orderItemId);
-            return Ok(updatedOrder);
-        }
-        catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
+        var updatedOrder = _orderItemsService.DeleteOrderItemsByOrderAndProductId(orderId, productId);
+        return updatedOrder is null ? NotFound() : Ok(updatedOrder);
+    }
+
+
+    [HttpDelete("order-items/{orderItemId:int}")]
+    public ActionResult<OrderReadDto> DeleteOrderItemsById(int orderItemId)
+    {
+        var updatedOrder = _orderItemsService.DeleteOrderItemsById(orderItemId);
+        return updatedOrder is null ? NotFound() : Ok(updatedOrder);
     }
 
 }
