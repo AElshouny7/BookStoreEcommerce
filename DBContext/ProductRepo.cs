@@ -32,6 +32,11 @@ namespace BookStoreEcommerce.DBContext
             return context.Products.ToList();
         }
 
+        public IEnumerable<Product> GetAllProductsByCategory(int categoryId)
+        {
+            return context.Products.Where(p => p.CategoryId == categoryId).ToList();
+        }
+
         public Product GetProductById(int id)
         {
             return context.Products.FirstOrDefault(p => p.Id == id);

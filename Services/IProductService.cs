@@ -6,6 +6,7 @@ namespace BookStoreEcommerce.Services
     public interface IProductService
     {
         IEnumerable<ProductReadDto> GetAllProducts();
+        IEnumerable<ProductReadDto> GetAllProductsByCategory(int categoryId);
         ProductReadDto? GetProductById(int id);
         ProductReadDto AddProduct(ProductCreateDto productDto);
         ProductReadDto? UpdateProduct(int id, ProductUpdateDto productDto);

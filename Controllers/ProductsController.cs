@@ -21,6 +21,14 @@ public class ProductsController(IProductService productService) : ControllerBase
         return Ok(products);
     }
 
+    // GET products by category
+    [HttpGet("category/{categoryId:int}")]
+    public ActionResult<IEnumerable<ProductReadDto>> GetAllProductsByCategory(int categoryId)
+    {
+        var products = _productService.GetAllProductsByCategory(categoryId);
+        return Ok(products);
+    }
+
     // GET product by id
     [HttpGet("{id:int}", Name = "GetProductById")]
     public ActionResult<ProductReadDto> GetProductById(int id)

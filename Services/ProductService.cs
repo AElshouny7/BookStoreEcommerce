@@ -23,6 +23,12 @@ namespace BookStoreEcommerce.Services
             return _mapper.Map<IEnumerable<ProductReadDto>>(products);
         }
 
+        public IEnumerable<ProductReadDto> GetAllProductsByCategory(int categoryId)
+        {
+            var products = _products.GetAllProductsByCategory(categoryId);
+            return _mapper.Map<IEnumerable<ProductReadDto>>(products);
+        }
+
         public ProductReadDto? GetProductById(int id)
         {
             var p = _products.GetProductById(id) ?? throw new InvalidOperationException("Product not found");
