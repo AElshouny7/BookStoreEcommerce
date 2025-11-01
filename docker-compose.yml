@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   postgres:
     image: postgres:16-alpine
@@ -22,9 +21,9 @@ services:
     image: redis:7-alpine
     container_name: bookstore_redis
     restart: unless-stopped
-    command: ["redis-server", "--appendonly", "yes"] # basic persistence
+    command: ["redis-server", "--appendonly", "yes"] 
     ports:
-      - "6379:6379" # expose only if you need to inspect from host
+      - "6379:6379" 
     volumes:
       - redisdata:/data
     healthcheck:
@@ -41,7 +40,7 @@ services:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
     ports:
-      - "5672:5672" # AMQP
+      - "5672:5672"
       - "15672:15672" # management UI (http://localhost:15672)
     volumes:
       - rabbitmqdata:/var/lib/rabbitmq
