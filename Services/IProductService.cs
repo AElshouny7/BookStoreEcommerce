@@ -5,12 +5,12 @@ namespace BookStoreEcommerce.Services
 {
     public interface IProductService
     {
-        IEnumerable<ProductReadDto> GetAllProducts();
-        IEnumerable<ProductReadDto> GetAllProductsByCategory(int categoryId);
-        ProductReadDto? GetProductById(int id);
-        ProductReadDto AddProduct(ProductCreateDto productDto);
-        ProductReadDto? UpdateProduct(int id, ProductUpdateDto productDto);
-        ProductReadDto? DeleteProduct(int id);
+        Task<IEnumerable<ProductReadDto>> GetAllProducts();
+        Task<IEnumerable<ProductReadDto>> GetAllProductsByCategory(int categoryId);
+        Task<ProductReadDto?> GetProductById(int id);
+        Task<ProductReadDto> AddProduct(ProductCreateDto productDto);
+        Task<ProductReadDto?> UpdateProduct(int id, ProductUpdateDto productDto);
+        Task<ProductReadDto?> DeleteProduct(int id);
 
     }
 }

@@ -15,25 +15,25 @@ public class ProductsController(IProductService productService) : ControllerBase
     // GET all products 
     // TODO: add categories to filter
     [HttpGet]
-    public ActionResult<IEnumerable<ProductReadDto>> GetAllProducts()
+    public async Task<ActionResult<IEnumerable<ProductReadDto>>> GetAllProducts()
     {
-        var products = _productService.GetAllProducts();
+        var products = await _productService.GetAllProducts();
         return Ok(products);
     }
 
     // GET products by category
     [HttpGet("category/{categoryId:int}")]
-    public ActionResult<IEnumerable<ProductReadDto>> GetAllProductsByCategory(int categoryId)
+    public async Task<ActionResult<IEnumerable<ProductReadDto>>> GetAllProductsByCategory(int categoryId)
     {
-        var products = _productService.GetAllProductsByCategory(categoryId);
+        var products = await _productService.GetAllProductsByCategory(categoryId);
         return Ok(products);
     }
 
     // GET product by id
     [HttpGet("{id:int}", Name = "GetProductById")]
-    public ActionResult<ProductReadDto> GetProductById(int id)
+    public async Task<ActionResult<ProductReadDto>> GetProductById(int id)
     {
-        var product = _productService.GetProductById(id);
+        var product = await _productService.GetProductById(id);
         if (product == null)
         {
             return NotFound();
@@ -43,11 +43,11 @@ public class ProductsController(IProductService productService) : ControllerBase
 
     // POST create new product
     [HttpPost]
-    public ActionResult<ProductReadDto> AddProduct(ProductCreateDto productCreateDto)
+    public async Task<ActionResult<ProductReadDto>> AddProduct(ProductCreateDto productCreateDto)
     {
         try
         {
-            var createdProduct = _productService.AddProduct(productCreateDto);
+            var createdProduct = await _productService.AddProduct(productCreateDto);
 
             return CreatedAtRoute(nameof(GetProductById), new { Id = createdProduct.Id }, createdProduct);
         }
@@ -65,7 +65,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     {
         try
         {
-            var updatedProduct = _productService.UpdateProduct(id, productUpdateDto);
+            var updatedProduct = await _productService.UpdateProduct(id, productUpdateDto);
             if (updatedProduct == null)
             {
                 return NotFound();
@@ -81,9 +81,9 @@ public class ProductsController(IProductService productService) : ControllerBase
 
     // DELETE delete product
     [HttpDelete("{id:int}")]
-    public ActionResult<ProductReadDto> DeleteProduct(int id)
+    public async Task<ActionResult<ProductReadDto>> DeleteProduct(int id)
     {
-        var deletedProduct = _productService.DeleteProduct(id);
+        var deletedProduct = await _productService.DeleteProduct(id);
         if (deletedProduct == null)
         {
             return NotFound();

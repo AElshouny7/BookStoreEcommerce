@@ -7,7 +7,7 @@ public static class CacheKeys
         return $"products:by-id:{productId}";
     }
 
-    public const string ProductListAll = "products:list:all";
+    public const string ProductsAll = "products:list:all";
 
     public static string ProductsByCategory(int categoryId)
     {

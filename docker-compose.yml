@@ -21,9 +21,9 @@ services:
     image: redis:7-alpine
     container_name: bookstore_redis
     restart: unless-stopped
-    command: ["redis-server", "--appendonly", "yes"] 
+    command: ["redis-server", "--appendonly", "yes"]
     ports:
-      - "6379:6379" 
+      - "6379:6379"
     volumes:
       - redisdata:/data
     healthcheck:
@@ -32,23 +32,39 @@ services:
       timeout: 5s
       retries: 5
 
-  rabbitmq:
-    image: rabbitmq:3.13-management-alpine
-    container_name: bookstore_rabbitmq
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: bookstore_redisinsight
     restart: unless-stopped
-    environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
     ports:
-      - "5672:5672"
-      - "15672:15672" # management UI (http://localhost:15672)
+      - "5540:5540" # http://localhost:5540
+    depends_on:
+      - redis
     volumes:
-      - rabbitmqdata:/var/lib/rabbitmq
+      - redisinsight:/data
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5540/health || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+
+  # rabbitmq:
+  #   image: rabbitmq:3.13-management-alpine
+  #   container_name: bookstore_rabbitmq
+  #   restart: unless-stopped
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+  #     RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672" # http://localhost:15672
+  #   volumes:
+  #     - rabbitmqdata:/var/lib/rabbitmq
+  #   healthcheck:
+  #     test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
 
   # bookstore_api:
   #   build:
@@ -70,4 +86,5 @@ services:
 volumes:
   pgdata:
   redisdata:
-  rabbitmqdata:
+  redisinsight:
+  # rabbitmqdata:
