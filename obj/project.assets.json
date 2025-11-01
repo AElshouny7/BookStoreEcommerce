@@ -5062,31 +5062,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\abd27\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "/home/runner/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\User\\Documents\\My Lab\\Gameball\\Phase 1\\Workspace\\BookStoreEcommerce\\BookStoreEcommerce.csproj",
+      "projectUniqueName": "/home/runner/work/BookStoreEcommerce/BookStoreEcommerce/BookStoreEcommerce.csproj",
       "projectName": "BookStoreEcommerce",
-      "projectPath": "E:\\User\\Documents\\My Lab\\Gameball\\Phase 1\\Workspace\\BookStoreEcommerce\\BookStoreEcommerce.csproj",
-      "packagesPath": "C:\\Users\\abd27\\.nuget\\packages\\",
-      "outputPath": "E:\\User\\Documents\\My Lab\\Gameball\\Phase 1\\Workspace\\BookStoreEcommerce\\obj\\",
+      "projectPath": "/home/runner/work/BookStoreEcommerce/BookStoreEcommerce/BookStoreEcommerce.csproj",
+      "packagesPath": "/home/runner/.nuget/packages/",
+      "outputPath": "/home/runner/work/BookStoreEcommerce/BookStoreEcommerce/obj/",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\abd27\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/home/runner/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -5183,7 +5176,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.306/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
