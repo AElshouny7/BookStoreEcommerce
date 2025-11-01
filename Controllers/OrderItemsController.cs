@@ -1,6 +1,7 @@
 using BookStoreEcommerce.Dtos.Order;
 using BookStoreEcommerce.Dtos.OrderItems;
 using BookStoreEcommerce.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStoreEcommerce.Controllers;
@@ -11,22 +12,26 @@ public class OrderItemsController(IOrderItemsService orderItemsService) : Contro
 {
     private readonly IOrderItemsService _orderItemsService = orderItemsService;
 
+    [Authorize(Roles = "Admin")]
     [HttpGet("order-items")]
     public ActionResult<IEnumerable<OrderItemsReadDto>> GetAllOrderItems()
         => Ok(_orderItemsService.GetAllOrderItems());
 
+    [Authorize]
     [HttpGet("orders/{orderId:int}/items")]
     public ActionResult<IEnumerable<OrderItemsReadDto>> GetByOrder(int orderId)
     {
         return Ok(_orderItemsService.GetOrderItemsByOrderId(orderId));
     }
 
+    [Authorize]
     [HttpGet("products/{productId:int}/order-items")]
     public ActionResult<IEnumerable<OrderItemsReadDto>> GetByProduct(int productId)
     {
         return Ok(_orderItemsService.GetOrderItemsByProductId(productId));
     }
 
+    [Authorize]
     [HttpGet("orders/{orderId:int}/items/{productId:int}")]
     public ActionResult<OrderItemsReadDto> GetByOrderAndProduct(int orderId, int productId)
     {
@@ -34,6 +39,7 @@ public class OrderItemsController(IOrderItemsService orderItemsService) : Contro
         return item is null ? NotFound() : Ok(item);
     }
 
+    [Authorize]
     [HttpGet("order-items/{id:int}")]
     public ActionResult<OrderItemsReadDto> GetOrderItemsById(int id)
     {
@@ -41,6 +47,7 @@ public class OrderItemsController(IOrderItemsService orderItemsService) : Contro
         return item is null ? NotFound() : Ok(item);
     }
 
+    [Authorize]
     [HttpPost("orders/{orderId:int}/items")]
     public ActionResult AddOrderItems(int orderId, [FromBody] OrderItemCreateDto dto)
     {
@@ -54,6 +61,7 @@ public class OrderItemsController(IOrderItemsService orderItemsService) : Contro
         catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
     }
 
+    [Authorize]
     [HttpPut("order-items/{orderItemId:int}")]
     public ActionResult UpdateOrderItems(int orderItemId, [FromBody] OrderItemUpdateDto dto)
     {
@@ -66,6 +74,7 @@ public class OrderItemsController(IOrderItemsService orderItemsService) : Contro
         catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
     }
 
+    [Authorize]
     [HttpDelete("orders/{orderId:int}/items/{productId:int}")]
     public ActionResult<OrderReadDto> DeleteOrderItemsByOrderAndProductId(int orderId, int productId)
     {
@@ -74,6 +83,7 @@ public class OrderItemsController(IOrderItemsService orderItemsService) : Contro
     }
 
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("order-items/{orderItemId:int}")]
     public ActionResult<OrderReadDto> DeleteOrderItemsById(int orderItemId)
     {

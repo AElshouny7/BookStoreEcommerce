@@ -1,6 +1,7 @@
 
 using BookStoreEcommerce.Dtos.Product;
 using BookStoreEcommerce.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStoreEcommerce.Controllers;
@@ -12,8 +13,8 @@ public class ProductsController(IProductService productService) : ControllerBase
     private readonly IProductService _productService = productService;
 
 
-    // GET all products 
-    // TODO: add categories to filter
+    // GET all products
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProductReadDto>>> GetAllProducts()
     {
@@ -22,6 +23,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     }
 
     // GET products by category
+    [AllowAnonymous]
     [HttpGet("category/{categoryId:int}")]
     public async Task<ActionResult<IEnumerable<ProductReadDto>>> GetAllProductsByCategory(int categoryId)
     {
@@ -30,6 +32,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     }
 
     // GET product by id
+    [AllowAnonymous]
     [HttpGet("{id:int}", Name = "GetProductById")]
     public async Task<ActionResult<ProductReadDto>> GetProductById(int id)
     {
@@ -42,6 +45,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     }
 
     // POST create new product
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<ProductReadDto>> AddProduct(ProductCreateDto productCreateDto)
     {
@@ -60,6 +64,7 @@ public class ProductsController(IProductService productService) : ControllerBase
 
 
     // PUT update product
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:int}")]
     public async Task<ActionResult<ProductReadDto>> UpdateProduct(int id, ProductUpdateDto productUpdateDto)
     {
@@ -80,6 +85,7 @@ public class ProductsController(IProductService productService) : ControllerBase
 
 
     // DELETE delete product
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:int}")]
     public async Task<ActionResult<ProductReadDto>> DeleteProduct(int id)
     {

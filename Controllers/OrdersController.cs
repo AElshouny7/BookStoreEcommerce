@@ -1,5 +1,6 @@
 using BookStoreEcommerce.Dtos.Order;
 using BookStoreEcommerce.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStoreEcommerce.Controllers;
@@ -10,6 +11,7 @@ public class OrdersController(IOrderService _orderService) : ControllerBase
 {
     private readonly IOrderService _orderService = _orderService;
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public ActionResult<IEnumerable<OrderReadDto>> GetAllOrders()
     {
@@ -17,6 +19,7 @@ public class OrdersController(IOrderService _orderService) : ControllerBase
         return Ok(orders);
     }
 
+    [Authorize]
     [HttpGet("{id:int}")]
     public ActionResult<OrderReadDto> GetOrderById(int id)
     {
@@ -24,6 +27,7 @@ public class OrdersController(IOrderService _orderService) : ControllerBase
         return order is null ? NotFound() : Ok(order);
     }
 
+    [Authorize]
     [HttpGet("by-user/{userId:int}")]
     public ActionResult<IEnumerable<OrderReadDto>> GetOrderByUser(int userId)
     {
@@ -31,6 +35,7 @@ public class OrdersController(IOrderService _orderService) : ControllerBase
         return Ok(orders);
     }
 
+    [Authorize(Roles = "Self")]
     [HttpPost]
     public ActionResult<OrderReadDto> CreateOrder([FromQuery] int userId, [FromBody] OrderCreateDto dto)
     {
@@ -53,6 +58,7 @@ public class OrdersController(IOrderService _orderService) : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:int}/status")]
     public ActionResult<OrderReadDto> UpdateStatus(int id, [FromBody] OrderStatusUpdateDto dto)
     {
@@ -70,6 +76,7 @@ public class OrdersController(IOrderService _orderService) : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:int}")]
     public ActionResult<OrderReadDto> DeleteOrder(int id)
     {

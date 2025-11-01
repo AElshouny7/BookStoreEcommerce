@@ -3,6 +3,7 @@ namespace BookStoreEcommerce.Controllers;
 using AutoMapper;
 using BookStoreEcommerce.Dtos.Category;
 using BookStoreEcommerce.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -32,6 +33,7 @@ public class CategoriesController(ICategoryService categoryService) : Controller
     }
 
     // POST create new category
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public ActionResult<CategoryReadDto> AddCategory(CategoryCreateDto categoryCreateDto)
     {
@@ -48,6 +50,7 @@ public class CategoriesController(ICategoryService categoryService) : Controller
     }
 
     // PUT update category
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public ActionResult<CategoryReadDto> UpdateCategory(int id, CategoryUpdateDto categoryUpdateDto)
     {
@@ -67,6 +70,7 @@ public class CategoriesController(ICategoryService categoryService) : Controller
     }
 
     // DELETE category
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public ActionResult<CategoryReadDto> DeleteCategory(int id)
     {
