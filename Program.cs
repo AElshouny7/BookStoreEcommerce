@@ -6,10 +6,12 @@ using BookStoreEcommerce.Models;
 using BookStoreEcommerce.Profiles;
 using BookStoreEcommerce.Services;
 using BookStoreEcommerce.Services.Auth;
+using BookStoreEcommerce.Services.Caching;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +45,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAppAuthorization();
+
+var redisConfig = builder.Configuration.GetSection("Redis");
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = redisConfig["Configuration"];
+    options.InstanceName = redisConfig["InstanceName"];
+});
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    ConnectionMultiplexer.Connect(builder.Configuration["Redis:Configuration"]!));
+
+builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 
 
 builder.Services.AddScoped<IProductRepo, ProductRepo>();
@@ -78,6 +92,10 @@ builder.Services.AddCors(options =>
               ;
     });
 });
+
+
+
+
 
 builder.Services.AddSwaggerGen();
 

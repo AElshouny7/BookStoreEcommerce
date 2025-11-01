@@ -78,6 +78,10 @@
               "target": "Package",
               "version": "[9.0.10, )"
             },
+            "Microsoft.Extensions.Caching.StackExchangeRedis": {
+              "target": "Package",
+              "version": "[8.0.21, )"
+            },
             "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
               "target": "Package",
               "version": "[1.22.1, )"
@@ -85,6 +89,10 @@
             "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
               "version": "[9.0.4, )"
+            },
+            "StackExchange.Redis": {
+              "target": "Package",
+              "version": "[2.9.32, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
