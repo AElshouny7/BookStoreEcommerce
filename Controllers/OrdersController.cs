@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using BookStoreEcommerce.Dtos.Order;
 using BookStoreEcommerce.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -28,18 +29,28 @@ public class OrdersController(IOrderService _orderService) : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("by-user/{userId:int}")]
-    public ActionResult<IEnumerable<OrderReadDto>> GetOrderByUser(int userId)
+    [HttpGet("by-user")]
+    public ActionResult<IEnumerable<OrderReadDto>> GetOrderByUser()
     {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                           ?? User.FindFirst("sub")?.Value;
+        if (!int.TryParse(userIdClaim, out var userId))
+            return Unauthorized(new { error = "Invalid token: missing user id." });
+
         var orders = _orderService.GetOrdersByUserId(userId);
         return Ok(orders);
     }
 
     [Authorize(Roles = "Self")]
     [HttpPost]
-    public ActionResult<OrderReadDto> CreateOrder([FromQuery] int userId, [FromBody] OrderCreateDto dto)
+    public ActionResult<OrderReadDto> CreateOrder([FromBody] OrderCreateDto dto)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
+
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                           ?? User.FindFirst("sub")?.Value;
+        if (!int.TryParse(userIdClaim, out var userId))
+            return Unauthorized(new { error = "Invalid token: missing user id." });
 
         try
         {
@@ -58,7 +69,7 @@ public class OrdersController(IOrderService _orderService) : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [HttpPut("{id:int}/status")]
     public ActionResult<OrderReadDto> UpdateStatus(int id, [FromBody] OrderStatusUpdateDto dto)
     {
