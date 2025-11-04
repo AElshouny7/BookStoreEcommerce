@@ -48,23 +48,23 @@ services:
       timeout: 5s
       retries: 10
 
-  # rabbitmq:
-  #   image: rabbitmq:3.13-management-alpine
-  #   container_name: bookstore_rabbitmq
-  #   restart: unless-stopped
-  #   environment:
-  #     RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-  #     RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
-  #   ports:
-  #     - "5672:5672"
-  #     - "15672:15672" # http://localhost:15672
-  #   volumes:
-  #     - rabbitmqdata:/var/lib/rabbitmq
-  #   healthcheck:
-  #     test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: bookstore_rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    ports:
+      - "5672:5672"
+      - "15672:15672" # http://localhost:15672
+    volumes:
+      - rabbitmqdata:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # bookstore_api:
   #   build:
@@ -87,4 +87,4 @@ volumes:
   pgdata:
   redisdata:
   redisinsight:
-  # rabbitmqdata:
+  rabbitmqdata:

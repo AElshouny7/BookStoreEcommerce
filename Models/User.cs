@@ -17,4 +17,6 @@ public class User
     public string? PasswordHash { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public DateTime LastActiveAt { get; set; } = DateTime.UtcNow;
 }

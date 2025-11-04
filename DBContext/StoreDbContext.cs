@@ -53,6 +53,8 @@ public class StoreDbContext(DbContextOptions<StoreDbContext> options) : DbContex
             e.Property(x => x.FullName).IsRequired().HasMaxLength(50);
             e.Property(x => x.Email).IsRequired().HasMaxLength(255);
             e.Property(x => x.PasswordHash).IsRequired();
+
+            e.HasIndex(x => x.LastActiveAt).IsUnique();
         });
 
         // Order (FK --> User)
