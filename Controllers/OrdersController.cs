@@ -32,8 +32,7 @@ public class OrdersController(IOrderService _orderService) : ControllerBase
     [HttpGet("by-user")]
     public ActionResult<IEnumerable<OrderReadDto>> GetOrderByUser()
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                           ?? User.FindFirst("sub")?.Value;
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!int.TryParse(userIdClaim, out var userId))
             return Unauthorized(new { error = "Invalid token: missing user id." });
 
@@ -43,18 +42,18 @@ public class OrdersController(IOrderService _orderService) : ControllerBase
 
     [Authorize(Roles = "Self")]
     [HttpPost]
-    public ActionResult<OrderReadDto> CreateOrder([FromBody] OrderCreateDto dto)
+    public async Task<ActionResult<OrderReadDto>> CreateOrder([FromBody] OrderCreateDto dto)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                           ?? User.FindFirst("sub")?.Value;
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        Console.WriteLine("UserIdClaim: " + userIdClaim);
         if (!int.TryParse(userIdClaim, out var userId))
             return Unauthorized(new { error = "Invalid token: missing user id." });
 
         try
         {
-            var created = _orderService.CreateOrder(userId, dto);
+            var created = await _orderService.CreateOrder(userId, dto);
             if (created is null) return BadRequest(new { error = "Failed to create order." });
 
             return CreatedAtAction(nameof(GetOrderById), new { id = created.Id }, created);

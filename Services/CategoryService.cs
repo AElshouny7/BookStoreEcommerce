@@ -17,9 +17,9 @@ namespace BookStoreEcommerce.Services
         private readonly ICategoryRepo _categories = _categories;
         private readonly IMapper _mapper = _mapper;
 
-        public IEnumerable<CategoryReadDto> GetAllCategories()
+        public async Task<IEnumerable<CategoryReadDto>> GetAllCategories()
         {
-            var categories = _categories.GetAllCategories();
+            var categories = await _categories.GetAllCategories();
             return _mapper.Map<IEnumerable<CategoryReadDto>>(categories);
         }
 

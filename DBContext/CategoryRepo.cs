@@ -1,5 +1,6 @@
 
 using BookStoreEcommerce.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreEcommerce.DBContext
 {
@@ -26,9 +27,9 @@ namespace BookStoreEcommerce.DBContext
             return category;
         }
 
-        public IEnumerable<Category> GetAllCategories()
+        public async Task<IEnumerable<Category>> GetAllCategories()
         {
-            return context.Categories.ToList();
+            return await context.Categories.AsNoTracking().ToListAsync();
         }
 
         public Category? GetCategoryById(int id)

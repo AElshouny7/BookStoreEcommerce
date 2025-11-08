@@ -14,9 +14,9 @@ public class CategoriesController(ICategoryService categoryService) : Controller
 
     // GET all categories
     [HttpGet]
-    public ActionResult<IEnumerable<CategoryReadDto>> GetAllCategories()
+    public async Task<ActionResult<IEnumerable<CategoryReadDto>>> GetAllCategories()
     {
-        var categories = _categoryService.GetAllCategories();
+        var categories = await _categoryService.GetAllCategories();
         return Ok(categories);
     }
 

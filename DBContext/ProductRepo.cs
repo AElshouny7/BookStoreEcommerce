@@ -42,6 +42,11 @@ namespace BookStoreEcommerce.DBContext
             return context.Products.FirstOrDefault(p => p.Id == id);
         }
 
+        public async Task<Product?> GetProductByIdAsync(int productId)
+        {
+            return await context.Products.FindAsync(productId);
+        }
+
         public bool SaveChanges()
         {
             return context.SaveChanges() >= 0;

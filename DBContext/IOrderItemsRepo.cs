@@ -9,7 +9,7 @@ namespace BookStoreEcommerce.DBContext
         IEnumerable<OrderItems> GetOrderItemsByProductId(int productId);
         OrderItems? GetOrderItemsByOrderAndProductId(int orderId, int productId);
         OrderItems? GetOrderItemById(int id);
-        OrderItems AddOrderItems(OrderItems orderItems);
+        Task<OrderItems> AddOrderItems(OrderItems orderItems);
         OrderItems? UpdateOrderItems(OrderItems orderItems);
         OrderItems? DeleteOrderItemsByOrderAndProductId(int orderId, int productId);
         OrderItems? DeleteOrderItemsById(int id);

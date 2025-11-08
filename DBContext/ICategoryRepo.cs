@@ -5,7 +5,7 @@ namespace BookStoreEcommerce.DBContext
 
     public interface ICategoryRepo
     {
-        IEnumerable<Category> GetAllCategories();
+        Task<IEnumerable<Category>> GetAllCategories();
         Category? GetCategoryById(int id);
         Category AddCategory(Category category);
         Category? UpdateCategory(Category category);

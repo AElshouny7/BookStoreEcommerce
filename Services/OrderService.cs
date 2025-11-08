@@ -3,6 +3,7 @@ using BookStoreEcommerce.DBContext;
 using BookStoreEcommerce.Dtos.Order;
 using BookStoreEcommerce.Dtos.OrderItems;
 using BookStoreEcommerce.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreEcommerce.Services;
 
@@ -32,12 +33,14 @@ public class OrderService
         return order is null ? null : BuildOrderReadDto(id);
     }
 
-    public OrderReadDto? CreateOrder(int userId, OrderCreateDto orderCreateDto)
+    public async Task<OrderReadDto?> CreateOrder(int userId, OrderCreateDto orderCreateDto)
     {
         if (orderCreateDto?.OrderItems is null || orderCreateDto.OrderItems.Count == 0)
         {
             throw new ArgumentException("Order must contain at least one order item.");
         }
+
+        await using var tx = await _context.Database.BeginTransactionAsync();
 
         var order = new Order
         {
@@ -47,14 +50,21 @@ public class OrderService
             TotalAmount = 0m
         };
 
-        _orders.AddOrder(order);
-        _context.SaveChanges();
+        // await _orders.AddOrder(order);
+        _context.Orders.Add(order);
+
+        await _context.SaveChangesAsync();
+
 
         decimal totalAmount = 0m;
         foreach (var itemDto in orderCreateDto.OrderItems)
         {
-            var product = _products.GetProductById(itemDto.ProductId)
-                 ?? throw new InvalidOperationException($"Product with ID {itemDto.ProductId} not found.");
+            // var product = await _products.GetProductByIdAsync(itemDto.ProductId)
+            //     ?? throw new InvalidOperationException($"Product with ID {itemDto.ProductId} not found.");
+
+            var product = await _context.Products
+           .SingleOrDefaultAsync(p => p.Id == itemDto.ProductId)
+           ?? throw new InvalidOperationException($"Product with ID {itemDto.ProductId} not found.");
 
             if (itemDto.Quantity <= 0)
                 throw new ArgumentException("Quantity must be greater than zero.");
@@ -63,8 +73,10 @@ public class OrderService
                 throw new InvalidOperationException($"Insufficient stock for product ID {itemDto.ProductId}.");
 
             var unitPrice = product.Price;
+            product.StockQuantity -= itemDto.Quantity;
 
-            _orderItems.AddOrderItems(new OrderItems
+
+            _context.OrderItems.Add(new OrderItems
             {
                 OrderId = order.Id,
                 ProductId = product.Id,
@@ -72,12 +84,21 @@ public class OrderService
                 UnitPrice = unitPrice
             });
 
-            product.StockQuantity -= itemDto.Quantity;
             totalAmount += unitPrice * itemDto.Quantity;
         }
 
         order.TotalAmount = totalAmount;
-        _context.SaveChanges();
+
+        try
+        {
+            await _context.SaveChangesAsync();
+            await tx.CommitAsync();
+        }
+        catch (DbUpdateConcurrencyException e)
+        {
+            await tx.RollbackAsync();
+            throw new InvalidOperationException(e.Message);
+        }
 
         return BuildOrderReadDto(order.Id);
 

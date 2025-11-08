@@ -36,6 +36,12 @@ public class StoreDbContext(DbContextOptions<StoreDbContext> options) : DbContex
             e.Property(x => x.Price).IsRequired().HasColumnType("decimal(18,2)");
             e.Property(x => x.Description).HasColumnType("text");
 
+            e.Property(p => p.RowVersion)
+            .IsConcurrencyToken()
+            .ValueGeneratedOnAddOrUpdate()
+            .HasColumnType("bytea")
+            .IsRequired();
+
             // Relations
             e.HasOne<Category>()
                 .WithMany()

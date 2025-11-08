@@ -35,6 +35,7 @@ var key = Encoding.UTF8.GetBytes(jwt["Key"]);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        options.MapInboundClaims = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -165,7 +166,7 @@ app.Use(async (_context, next) =>
         {
             var userActivityService = _context.RequestServices.GetRequiredService<IUserActivityService>();
             // fire and forget
-            _ = userActivityService.TouchAsync(userId);
+            await userActivityService.TouchAsync(userId);
         }
     }
 

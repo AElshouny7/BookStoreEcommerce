@@ -6,7 +6,7 @@ public interface IOrderService
 {
     IEnumerable<OrderReadDto> GetAllOrders();
     OrderReadDto? GetOrderById(int id);
-    OrderReadDto? CreateOrder(int userId, OrderCreateDto orderCreateDto);
+    Task<OrderReadDto?> CreateOrder(int userId, OrderCreateDto orderCreateDto);
     OrderReadDto? DeleteOrder(int orderId);
     IEnumerable<OrderReadDto> GetOrdersByUserId(int userId);
 

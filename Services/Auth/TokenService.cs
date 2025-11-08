@@ -33,7 +33,12 @@ public class TokenService(IConfiguration config) : ITokenService
             claimsList.Add(new Claim(ClaimTypes.Role, "Admin"));
             claims = claimsList.ToArray();
         }
-
+        else
+        {
+            var claimsList = claims.ToList();
+            claimsList.Add(new Claim(ClaimTypes.Role, "Self"));
+            claims = claimsList.ToArray();
+        }
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var expires = DateTime.UtcNow.AddMinutes(
             double.Parse(jwtSettings["AccessTokenDurationInMinutes"] ?? "60"));

@@ -6,10 +6,10 @@ namespace BookStoreEcommerce.DBContext
     {
         private readonly StoreDbContext _context = context;
 
-        public OrderItems AddOrderItems(OrderItems orderItems)
+        public async Task<OrderItems> AddOrderItems(OrderItems orderItems)
         {
             ArgumentNullException.ThrowIfNull(orderItems);
-            _context.OrderItems.Add(orderItems);
+            await _context.OrderItems.AddAsync(orderItems);
             return orderItems;
         }
 

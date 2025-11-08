@@ -12,5 +12,6 @@ namespace BookStoreEcommerce.DBContext
         Product? UpdateProduct(Product product);
         Product? DeleteProduct(int id);
         bool SaveChanges();
+        Task<Product?> GetProductByIdAsync(int productId);
     }
 }

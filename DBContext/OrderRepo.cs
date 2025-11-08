@@ -23,10 +23,10 @@ namespace BookStoreEcommerce.DBContext
             return _context.Orders.FirstOrDefault(o => o.Id == id);
         }
 
-        public Order AddOrder(Order order)
+        public async Task<Order> AddOrder(Order order)
         {
             ArgumentNullException.ThrowIfNull(order, nameof(order));
-            _context.Orders.Add(order);
+            await _context.Orders.AddAsync(order);
             return order;
         }
 
