@@ -39,4 +39,34 @@ public class AuthController(IUserService userService) : ControllerBase
             return Unauthorized(new { message = ex.Message });
         }
     }
+
+    [HttpPost("refresh")]
+    [AllowAnonymous]
+    public ActionResult<AuthResponseDto> RefreshToken([FromBody] RefreshRequestDto request)
+    {
+        try
+        {
+            var response = userService.Refresh(request.RefreshToken);
+            return Ok(response);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Unauthorized(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("logout")]
+    [Authorize]
+    public IActionResult Logout()
+    {
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdClaim, out var userId))
+            return Unauthorized(new { message = "Invalid token: missing user id." });
+        userService.RevokeRefreshToken(userId);
+        return NoContent();
+    }
 }

@@ -19,4 +19,8 @@ public class User
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime LastActiveAt { get; set; } = DateTime.UtcNow;
+
+    public string? RefreshTokenHash { get; set; }
+    public DateTime? RefreshTokenExpiresUtc { get; set; }
+    public DateTime? RefreshTokenRevokedUtc { get; set; }
 }

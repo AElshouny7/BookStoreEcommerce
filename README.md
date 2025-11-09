@@ -177,6 +177,26 @@ Seed data occurs in `PrepDb.PrepPopulation(app);` during startup.
 
 Include `Authorization: Bearer <token>` header for protected endpoints.
 
+### Refresh Tokens
+
+On login the API now returns both an access token and a refresh token. Use the refresh token to obtain a new pair before or after the access token expires:
+
+`POST /api/Auth/refresh`
+
+Request body:
+
+```json
+{
+  "refreshToken": "<your-current-refresh-token>"
+}
+```
+
+Response returns a rotated refresh token and a new access token. Always replace the stored refresh token with the new one (rotation). To revoke the active refresh token for the signed-in user call:
+
+`POST /api/Auth/logout` (Authorization header required)
+
+Expiration configuration: `Jwt:RefreshTokenDurationInDays` (default 7).
+
 ## 11. Caching Strategy
 
 Redis configured with a key prefix `bookstore:`. `CacheService` centralizes operations & TTL via `CacheTtls`. Example keys may include product lists or category lists. Default TTL set to 300 seconds.
@@ -255,6 +275,7 @@ Order Items (mixed route base):
 | Containerizing infra vs API                              | API disabled in compose for iterative dev                                                             | Provided instructions to uncomment service; environment variables pattern documented.                                                                               |
 | Handling order item uniqueness                           | Need consistent retrieval by order+product                                                            | Dedicated routes & composite lookup method in service.                                                                                                              |
 | Connection string name mismatch                          | Code calls `GetConnectionString("Default")` while config key is `ConnectionStrings:DefaultConnection` | Align by renaming config key to `Default` or change code to use `GetConnectionString("DefaultConnection")`. README calls this out to avoid null connection strings. |
+| Adding secure token refresh                              | Needed long-lived sessions without re-login                                                           | Implemented hashed single active refresh token with rotation & revoke endpoints.                                                                                    |
 
 ## 15. Troubleshooting & FAQ
 
@@ -295,4 +316,4 @@ Accessible at `/hangfire` (secured via app-level auth if extended).
 
 ---
 
-_Last updated: 2025-11-08_
+Last updated: 2025-11-09

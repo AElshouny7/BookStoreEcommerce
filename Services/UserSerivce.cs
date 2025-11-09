@@ -23,7 +23,8 @@ public class UserService(
     private readonly IUserRepo _users = _users;
     private readonly IMapper _mapper = _mapper;
 
-    private readonly int _accessMinutes = _config.GetValue<int?>("Jwt:AccessTokenExpireMinutes") ?? 60;
+    private readonly int _accessMinutes = _config.GetValue<int?>("Jwt:AccessTokenDurationInMinutes") ?? 60;
+    private readonly int _refreshDays = _config.GetValue<int?>("Jwt:RefreshTokenDurationInDays") ?? 7;
 
 
     public IEnumerable<UserReadDto> GetAllUsers()
@@ -90,19 +91,71 @@ public class UserService(
         var user = _context.Users.FirstOrDefault(u => u.Email == userLoginDto.Email)
             ?? throw new InvalidOperationException("Invalid credentials");
 
+        if (string.IsNullOrEmpty(user.PasswordHash))
+            throw new InvalidOperationException("User password not set");
         var verificationResult = _hasher.VerifyHashedPassword(user, user.PasswordHash, userLoginDto.Password);
         if (verificationResult == PasswordVerificationResult.Failed)
             throw new InvalidOperationException("Invalid credentials");
 
-        var token = _tokens.CreateToken(user);
-        var expiresAt = DateTime.UtcNow.AddMinutes(_accessMinutes);
+        var accessToken = _tokens.CreateToken(user);
+        var accessExpiresAt = DateTime.UtcNow.AddMinutes(_accessMinutes);
+
+        // Issue new refresh token (rotation on every login)
+        var newRefreshToken = _tokens.GenerateRefreshToken();
+        user.RefreshTokenHash = _tokens.HashToken(newRefreshToken);
+        user.RefreshTokenExpiresUtc = DateTime.UtcNow.AddDays(_refreshDays);
+        user.RefreshTokenRevokedUtc = null; // reset any previous revoke
+        _context.SaveChanges();
 
         return new AuthResponseDto
         {
-            Token = token,
-            ExpiresAt = expiresAt,
+            Token = accessToken,
+            ExpiresAt = accessExpiresAt,
+            RefreshToken = newRefreshToken,
+            RefreshTokenExpiresAt = user.RefreshTokenExpiresUtc,
             User = _mapper.Map<UserReadDto>(user)
         };
+    }
+
+    public AuthResponseDto Refresh(string refreshToken)
+    {
+        if (string.IsNullOrWhiteSpace(refreshToken))
+            throw new ArgumentException("Refresh token missing");
+
+        var refreshHash = _tokens.HashToken(refreshToken);
+        var user = _context.Users.FirstOrDefault(u => u.RefreshTokenHash == refreshHash);
+        if (user == null)
+            throw new InvalidOperationException("Invalid refresh token");
+        if (user.RefreshTokenRevokedUtc.HasValue)
+            throw new InvalidOperationException("Refresh token revoked");
+        if (!user.RefreshTokenExpiresUtc.HasValue || user.RefreshTokenExpiresUtc.Value < DateTime.UtcNow)
+            throw new InvalidOperationException("Refresh token expired");
+
+        // Rotate refresh token
+        var newRefreshToken = _tokens.GenerateRefreshToken();
+        user.RefreshTokenHash = _tokens.HashToken(newRefreshToken);
+        user.RefreshTokenExpiresUtc = DateTime.UtcNow.AddDays(_refreshDays);
+        _context.SaveChanges();
+
+        var newAccessToken = _tokens.CreateToken(user);
+        var accessExpiresAt = DateTime.UtcNow.AddMinutes(_accessMinutes);
+
+        return new AuthResponseDto
+        {
+            Token = newAccessToken,
+            ExpiresAt = accessExpiresAt,
+            RefreshToken = newRefreshToken,
+            RefreshTokenExpiresAt = user.RefreshTokenExpiresUtc,
+            User = _mapper.Map<UserReadDto>(user)
+        };
+    }
+
+    public void RevokeRefreshToken(int userId)
+    {
+        var user = _context.Users.FirstOrDefault(u => u.Id == userId)
+            ?? throw new InvalidOperationException("User not found");
+        user.RefreshTokenRevokedUtc = DateTime.UtcNow;
+        _context.SaveChanges();
     }
 
 

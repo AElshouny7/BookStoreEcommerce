@@ -12,4 +12,7 @@ public interface IUserService
 
     AuthResponseDto AuthenticateUser(UserLoginDto userLoginDto);
 
+    AuthResponseDto Refresh(string refreshToken);
+    void RevokeRefreshToken(int userId);
+
 }
