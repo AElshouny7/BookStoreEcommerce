@@ -130,10 +130,14 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
-        policy.WithOrigins(allowedOrigins)
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              ;
+        policy
+          .SetIsOriginAllowed(origin =>
+          {
+              if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri)) return false;
+              return (uri.Host == "localhost" || uri.Host == "127.0.0.1") && uri.Port == 4200;
+          })
+          .AllowAnyHeader()
+          .AllowAnyMethod();
     });
 });
 
